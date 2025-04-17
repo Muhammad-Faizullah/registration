@@ -21,7 +21,10 @@ class UserManager(BaseUserManager):
         if not username:
             raise ValueError("must enter username")
         
-        user = self.model(email=self.normalize_email(email),username=username)
+        user = self.model(
+            email=self.normalize_email(email),
+            username=username
+        )
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
@@ -31,7 +34,7 @@ class UserManager(BaseUserManager):
     
 class User(AbstractBaseUser):
     email = models.EmailField(unique=True)
-    username = models.CharField(max_length=100,blank=True,null=True)
+    username = models.CharField(max_length=50,blank=True,null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -41,4 +44,8 @@ class User(AbstractBaseUser):
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = ["username"]
     
-        
+    def has_perm(self,perms,obj=None):
+        return self.is_admin
+
+    def has_module_perms(self,app_label):
+        return True        
