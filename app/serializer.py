@@ -18,24 +18,18 @@ class RegisterSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=50)
-    
-    def validate(self,data):
-        email = data.get('email')
-        password = data.get('password')
-        
-        if email and password:
-            obj = authenticate(email=email,password=password)
-            return obj
-        return data
+                      
 
 class ChangePasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
     old_password = serializers.CharField(max_length=50)
     new_password = serializers.CharField(max_length=50)
     confirm_new_password = serializers.CharField(max_length=50)
     
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
     def validate(self,data):
-        if data['old_password'] == data['new_password']:
-            raise serializers.ValidationError("old and new password cannot be same")
-        if data['new_password'] != data['confirm_new_password']:
-            raise serializers.ValidationError("confirm_new_password and new_password are not similar")
-        
+        if data:
+            otp = 
