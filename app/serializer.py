@@ -29,7 +29,3 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class ResetPasswordSerializer(serializers.Serializer):
     email = serializers.EmailField()
-
-    def validate(self,data):
-        if data:
-            otp = 
