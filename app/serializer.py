@@ -28,4 +28,14 @@ class LoginSerializer(serializers.Serializer):
             return obj
         return data
 
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(max_length=50)
+    new_password = serializers.CharField(max_length=50)
+    confirm_new_password = serializers.CharField(max_length=50)
     
+    def validate(self,data):
+        if data['old_password'] == data['new_password']:
+            raise serializers.ValidationError("old and new password cannot be same")
+        if data['new_password'] != data['confirm_new_password']:
+            raise serializers.ValidationError("confirm_new_password and new_password are not similar")
+        
