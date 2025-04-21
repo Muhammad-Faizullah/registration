@@ -49,3 +49,7 @@ class User(AbstractBaseUser):
 
     def has_module_perms(self,app_label):
         return True        
+    
+class Otp(models.Model):
+    email = models.EmailField()
+    otp = models.CharField(max_length=4)

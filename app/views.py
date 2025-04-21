@@ -1,17 +1,24 @@
 from django.shortcuts import render
-from .models import User
-from .serializer import RegisterSerializer,LoginSerializer,ChangePasswordSerializer,ResetPasswordSerializer
+from .models import User,Otp
+from .serializer import RegisterSerializer,LoginSerializer,ChangePasswordSerializer,ResetPasswordSerializer,GenerateOtpSerializer
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView,CreateAPIView,UpdateAPIView,DestroyAPIView,RetrieveAPIView
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth import authenticate
 from rest_framework import status
-from rest_framework_simplejwt.tokens import RefreshToken,AccessToken
+from rest_framework_simplejwt.tokens import RefreshToken
+import math,random
 # Create your views here.
 
+# def generate_token(user):
+#     refresh_token = RefreshToken.for_user(user)
+#     return {
+#         "refresh token":str(refresh_token),
+#         "access token":str(refresh_token.access_token)
+#     }
 
-class RegisterApi(ListAPIView,CreateAPIView):
+class RegisterApi(ListAPIView,CreateAPIView ):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     
@@ -28,7 +35,7 @@ class LoginApi(APIView):
                 print('user',user)
                 if user is not None:
                     return Response('Login successful')
-
+            return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)
 class ChangePasswordApi(APIView):
     
     def post(self,request,*args,**kwargs):
@@ -54,6 +61,7 @@ class ChangePasswordApi(APIView):
                     user_obj.save()
                     
                     return Response('Password Changed')
+            return Response(serializer.errors,status=status.HTTP_406_NOT_ACCEPTABLE)
 
 class ResetPasswordApi(APIView):
     
@@ -62,4 +70,18 @@ class ResetPasswordApi(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)
                 
+class GenerateOTPApi(APIView):
+    
+    def get(self,request,*args,**kwargs):
+        obj = Otp.objects.all()
+        serializer = GenerateOtpSerializer(obj,many=True)
+        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
+    
+    def post(self,request,*args,**kwargs):
+        serializer = GenerateOtpSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)

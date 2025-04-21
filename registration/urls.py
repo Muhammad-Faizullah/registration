@@ -16,11 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from app.views import RegisterApi,LoginApi,ChangePasswordApi,ResetPasswordApi
+from app.views import RegisterApi,LoginApi,ChangePasswordApi,ResetPasswordApi,GenerateOTPApi
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('register/',RegisterApi.as_view()),
     path('login/',LoginApi.as_view()),
     path('changePassword/',ChangePasswordApi.as_view()),
-    path('resetPassword/',ResetPasswordApi.as_view())
+    path('resetPassword/',ResetPasswordApi.as_view()),
+    path('generateOtp/',GenerateOTPApi.as_view())
 ]

@@ -5,3 +5,7 @@ from .models import User
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
     list_display = ['id','username','email','password']
+    
+# @admin.register(Otp)
+# class OtpAdmin(admin.ModelAdmin):
+#     list_display = ['id','email']
