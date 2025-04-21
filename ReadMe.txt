@@ -1,15 +1,1 @@
-asgiref                       3.8.1
-certifi                       2025.1.31
-charset-normalizer            3.4.1
-Django                        4.2.20
-djangorestframework           3.16.0
-djangorestframework_simplejwt 5.5.0
-idna                          3.10
-pip                           25.0
-PyJWT                         2.9.0
-requests                      2.32.3
-setuptools                    75.8.0
-sqlparse                      0.5.3
-typing_extensions             4.13.2
-urllib3                       2.4.0
-wheel                         0.45.1
+
