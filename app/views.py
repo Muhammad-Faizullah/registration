@@ -73,6 +73,8 @@ class ResetPasswordApi(APIView):
         return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)
                 
 class GenerateOTPApi(APIView):
+    # authentication_classes = []
+    # permission_classes = []
     
     def get(self,request,*args,**kwargs):
         obj = Otp.objects.all()

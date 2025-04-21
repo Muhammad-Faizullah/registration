@@ -35,37 +35,18 @@ class ResetPasswordSerializer(serializers.Serializer):
 
 class GenerateOtpSerializer(serializers.Serializer):
     email = serializers.EmailField()
-    username = serializers.CharField(max_length=100)
     otp = serializers.CharField(max_length=4,read_only=True)
     
-    # def otp_generator(user):
-    #     digits = '0123456789'
-    #     otp = ''
-    #     for i in range(4):
-    #         otp += digits[math.floor(random.random() * 10)]
-    #         print('otp',otp)
-    #         return otp
-    
-    def validate(self, data):
-        email = data.get('email')
-        print('email',email)
-        username = data.get('username')
-        print('username',username)
-        user = authenticate(username=username,email=email)
-        print('user',user)
-        if user:
-            digits = '0123456789'
-            otp = ''
-            for i in range(4):
-                otp += digits[math.floor(random.random() * 10)]
-                return otp
-            
-                
-        return data
-    
-    def create(self,validated_data):
-        return Otp.objects.create(
-            email = validated_data['email'],
-            otp = validated_data['otp_for']['otp']
-        )   
+    def validate(self, attrs):
+        email = attrs.get('email')
+        try:
+            user_obj = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError({"error":"invalid email"})
+
+        digits = '256789'
+        # print('otp',digits[math.floor(random.random() * 10)])
+        otp = digits[math.floor(random.random() * 10)]
+        Otp.objects.create(user = user_obj, otp=otp)
+        return attrs
 
