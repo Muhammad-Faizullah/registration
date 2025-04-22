@@ -33,12 +33,11 @@ class UserManager(BaseUserManager):
         return user
     
 class User(AbstractBaseUser):
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True,null=True,blank=True)
     username = models.CharField(max_length=50,blank=True,null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
-    
     
     objects = UserManager()
     USERNAME_FIELD = "email"
@@ -51,5 +50,5 @@ class User(AbstractBaseUser):
         return True        
     
 class Otp(models.Model):
-    email = models.EmailField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     otp = models.CharField(max_length=4)

@@ -9,18 +9,17 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 import math,random
-# Create your views here.
+from rest_framework.serializers import ValidationError
 
-# def generate_token(user):
-#     refresh_token = RefreshToken.for_user(user)
-#     return {
-#         "refresh token":str(refresh_token),
-#         "access token":str(refresh_token.access_token)
-#     }
 
-class RegisterApi(ListAPIView,CreateAPIView ):
-    queryset = User.objects.all()
-    serializer_class = RegisterSerializer
+class RegisterApi(APIView):
+
+    def post(self,request,*args,**kwargs):
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message":"user registered successfully"},status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class LoginApi(APIView):
     
@@ -29,61 +28,38 @@ class LoginApi(APIView):
         if serializer.is_valid():
             email = serializer.data.get('email')
             password = serializer.data.get('password')
-            print(email,password)
-            if email and password is not None:
-                user = authenticate(email=email,password=password)
-                print('user',user)
-                if user is not None:
-                    return Response('Login successful')
-            return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)
+            user = authenticate(email=email,password=password)
+            if user is None:
+                raise ValidationError({"error":"Invalid credentials"})
+            print('user',user)
+            username = user.username
+            email = user.email
+            refresh_token = RefreshToken.for_user(user)
+            access_token = str(refresh_token.access_token)
+            return Response({"message":"login successful","user":{"id":user.id,"username":username,"email":email},"tokens":{"refresh_token":str(refresh_token),"access_token":access_token}},status=status.HTTP_200_OK)    
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 class ChangePasswordApi(APIView):
     
     def post(self,request,*args,**kwargs):
-        serializer = ChangePasswordSerializer(data=request.data)
+        serializer = ChangePasswordSerializer(data=request.data,context={"request":request})
         if serializer.is_valid():
-            print(serializer.data.get('old_password'))
-            print(serializer.data.get('new_password'))
-            email = serializer.data.get('email')
-            old_password = serializer.validated_data.get('old_password')
-            new_password = serializer.validated_data.get('new_password')
-            user = authenticate(email=email,password=old_password)
-            if user is not None:
-                print('user',user)
-                print(User.objects.get(email=email))
-                user_obj = User.objects.get(email=email)
-                if user_obj is not None:
-                    print('user_obj',user_obj)
-                    print(user_obj.password)
-                    # user_obj.password = new_password
-                    # print(user_obj.password)
-                    user_obj.set_password(new_password)
-                    print(user_obj.password)
-                    user_obj.save()
-                    
-                    return Response('Password Changed')
-            return Response(serializer.errors,status=status.HTTP_406_NOT_ACCEPTABLE)
+            return Response({"message":"password changed successfully"},status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
 class ResetPasswordApi(APIView):
     
     def post(self,request,*args,**kwargs):
         serializer = ResetPasswordSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)
+            return Response({"message":"password reset successfully"},status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
                 
 class GenerateOTPApi(APIView):
-    # authentication_classes = []
-    # permission_classes = []
-    
-    def get(self,request,*args,**kwargs):
-        obj = Otp.objects.all()
-        serializer = GenerateOtpSerializer(obj,many=True)
-        return Response(serializer.data,status=status.HTTP_202_ACCEPTED)
     
     def post(self,request,*args,**kwargs):
         serializer = GenerateOtpSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data,status=status.HTTP_201_CREATED)
-        return Response(serializer.errors,status=status.HTTP_401_UNAUTHORIZED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
