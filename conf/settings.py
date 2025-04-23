@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt',
     'account',
+    'content'
+    
 ]
 
 REST_FRAMEWORK = {
