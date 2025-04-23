@@ -1,5 +1,5 @@
 """
-URL configuration for registration project.
+URL configuration for conf project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.2/topics/http/urls/
@@ -15,13 +15,9 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-from app.views import RegisterApi,LoginApi,ChangePasswordApi,ResetPasswordApi,GenerateOTPApi
+from django.urls import path,include
+from account import urls
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('register/',RegisterApi.as_view()),
-    path('login/',LoginApi.as_view()),
-    path('changePassword/',ChangePasswordApi.as_view()),
-    path('resetPassword/',ResetPasswordApi.as_view()),
-    path('generateOtp/',GenerateOTPApi.as_view())
+    path('',include(urls))
 ]
