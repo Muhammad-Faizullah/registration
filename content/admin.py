@@ -4,7 +4,7 @@ from .models import Product,ProductImage
 
 @admin.register(ProductImage)
 class ImageAdmin(admin.ModelAdmin):
-    list_display = ['id','image','product']
+    list_display = ['id','image_file','product']
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):

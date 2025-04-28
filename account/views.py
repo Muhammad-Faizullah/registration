@@ -11,6 +11,7 @@ from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 import math,random
 from rest_framework.serializers import ValidationError
+from django.core.files.storage import Storage,default_storage,DefaultStorage
 
 
 class RegisterApi(APIView):
@@ -96,3 +97,22 @@ class UserProfileApi(APIView):
             return Response(serializer.data,status=status.HTTP_200_OK)
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+class UploadFileApi(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def post(self,request,*args,**kwargs):
+        folder = request.data.get('folder')
+        file = request.data.get('file')
+        
+        if folder is None:
+            return Response({"error":"folder is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        if file is None:
+            return Response({"error":"file is required"},status=status.HTTP_400_BAD_REQUEST)
+        
+        full_path = f'{folder}/{file.name}'        
+        saved_file = default_storage.save(full_path,file)
+        file_url = default_storage.url(saved_file)
+        return Response({"url":file_url,"path":str(full_path)})
