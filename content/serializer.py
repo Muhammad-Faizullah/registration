@@ -1,7 +1,12 @@
 from rest_framework import serializers
-from .models import Product,ProductImage
+from .models import Product,ProductImage,Category
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ['id','name','description']
 
 class ProductImageSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
@@ -16,7 +21,7 @@ class ProductSerializer(WritableNestedModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id','user','brand','name','color','price','quantity','condition','description','product_image']
+        fields = ['id','user','category','brand','name','color','price','quantity','condition','description','product_image']
         
     # def create(self, validated_data):
     #     print('validated data', validated_data)
