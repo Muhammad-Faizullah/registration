@@ -1,9 +1,12 @@
 from rest_framework import serializers
+from account.serializer import UserProfileSerializer
+from account.models import User
 from .models import Product,ProductImage,Category
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Category
         fields = ['id','name','description']
@@ -11,6 +14,7 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductImageSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     image_file = serializers.CharField(max_length=200)
+    
     class Meta:
         model = ProductImage
         fields = ['id','product','image_file']
@@ -21,48 +25,39 @@ class ProductSerializer(WritableNestedModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id','user','category','brand','name','color','price','quantity','condition','description','product_image']
-        
-    # def create(self, validated_data):
-    #     print('validated data', validated_data)
-    #     pop_data = validated_data.pop('product_image')
-    #     product = Product.objects.create(**validated_data)
-        
-    #     for data in pop_data:
-    #         ProductImage.objects.create(
-    #             product=product,**data
-    #         )
-        
-    #     return product
+        fields = ['id','user','category','brand','name','color','price','quantity','description','product_image']       
     
-    # def update(self,instance,validated_data):
-    #     product_image_data = validated_data.pop('product_image')
-    #     instance.user = validated_data.get('user',instance.user)
-    #     instance.brand = validated_data.get('brand',instance.brand)
-    #     instance.name = validated_data.get('name',instance.name)
-    #     instance.color = validated_data.get('color',instance.color)
-    #     instance.price = validated_data.get('price',instance.price)
-    #     instance.quantity = validated_data.get('quantity',instance.quantity)
-    #     instance.condition = validated_data.get('condition',instance.condition)
-    #     instance.description = validated_data.get('description',instance.description)
-    #     instance.save()
+    
+class ProductListSerializer(serializers.ModelSerializer):
+    product_image = ProductImageSerializer(many=True,read_only=True)
+    # product_category = CategorySerializer(read_only=True)
+    # product_user = UserProfileSerializer(read_only=True)
+    # user_email = serializers.CharField(source='user.email', read_only=True)
+    # user_email = serializers.CharField(read_only=True)
+    user_detail = serializers.SerializerMethodField()
+    category_detail = serializers.SerializerMethodField()
+    class Meta:
+        model = Product
+        fields = ['id','brand','name','color','price','quantity','description','product_image','user_detail','category_detail']
+        
+        
+    def get_user_detail(self, obj):
+        # return obj.user.email if obj.user else  ''
+        if obj.user:
+            return {
+                    "id":obj.user.id,
+                    "email":obj.user.email
+                }
 
-    #     for data in product_image_data:            
-    #         if 'id' in data.keys():
-    #             id = data.get('id')
-    #             if ProductImage.objects.filter(id=id).exists():
-    #                 obj = ProductImage.objects.get(id=id)
-    #                 # obj.product = data.get('product',obj.product)
-    #                 obj.image_file = data.get('image_file',obj.image_file)
-    #                 obj.save()
-    #             else:
-    #                 continue
-    #         else:
-    #             obj = ProductImage.objects.create(
-    #                 **data,product=instance
-    #             )
-    #             print('obj',obj)
-                
-    #     return instance
-                     
+        else:
+            return ''
+        
+    def get_category_detail(self,obj):
+        if obj.category:
+            return {
+                    "id":obj.category.id,
+                    "name":obj.category.name
+                }
 
+        else:
+            return ''
