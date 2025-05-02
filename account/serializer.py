@@ -6,6 +6,32 @@ from rest_framework.authentication import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 import math,random
 
+class AdminUserSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = "__all__"
+        
+    def validate(self,attrs):
+        email = attrs.get('email')
+        
+        if email == '':
+            raise ValidationError({"error":"valid email is required"})
+        
+        if User.objects.filter(email=email).exists():
+            raise ValidationError({"error":"User with this email already exists"})
+        
+        return attrs
+            
+    def create(self,validated_data):
+        password = validated_data.get('password')
+        user = User.objects.create(**validated_data)
+        user.set_password(password)
+        user.is_admin = True
+        user.is_staff = True
+        user.save()
+        return user
+        
 
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=50)
@@ -35,7 +61,9 @@ class RegisterSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(max_length=50)
-                      
+    user_detail = serializers.SerializerMethodField()
+    token_detail = serializers.SerializerMethodField()
+                   
     def validate(self,attrs):
         email = attrs.get('email')
         password = attrs.get('password')
@@ -46,7 +74,44 @@ class LoginSerializer(serializers.Serializer):
         if password is None:
             raise serializers.ValidationError({"password ":"must not be empty"})
 
+        user = authenticate(email=email,password=password)
+        
+        if user is None:
+            raise ValidationError({"error":"Invalid credentials"})
+        
+        username = user.username
+        email = user.email
+        refresh_token = RefreshToken.for_user(user)
+        access_token = str(refresh_token.access_token)
+        attrs['token'] = {
+            "refresh_token":str(refresh_token),
+            "access_token":access_token
+        }
+        attrs["user"] = {
+            "id":user.id,
+            "username":username,
+            "email":email
+        }
         return attrs
+    
+    def get_user_detail(self,obj):
+
+        user = obj.get('user')
+        if user:
+            return {
+                "id":user.get('id'),
+                "username":user.get('username'),
+                "email":user.get('email')
+            }
+        
+    def get_token_detail(self,obj):
+        token = obj.get('token')
+        if token:
+            return {
+                "refresh_token":token.get('refresh_token'),
+                "access_token":token.get('access_token')
+            }
+            
 
 
 class ChangePasswordSerializer(serializers.Serializer):

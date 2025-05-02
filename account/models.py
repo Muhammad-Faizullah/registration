@@ -37,6 +37,7 @@ class User(AbstractBaseUser):
     username = models.CharField(max_length=50,blank=True,null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_owner = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
     date_of_birth = models.DateField(null=True,blank=True)
     phone_number = models.CharField(max_length=11,null=True,blank=True)

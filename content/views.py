@@ -24,10 +24,10 @@ class CategoryRetrieveView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
 
 class ProductListView(ListAPIView):
-    queryset = Product.objects.all()
+    queryset = Product.objects.filter(publish=True)
     serializer_class = ProductListSerializer
     filter_backends = [filters.DjangoFilterBackend]
-    filterset_class = ProductFilter
+    filterset_class = ProductFilter        
 
 class ProductRetrieveView(APIView):
     

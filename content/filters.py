@@ -10,5 +10,5 @@ class CategoryFilter(FilterSet):
 class ProductFilter(FilterSet):
     class Meta:
         model = Product
-        fields = ['name','category']
+        fields = ['name','category','publish']
         

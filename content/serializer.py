@@ -25,24 +25,20 @@ class ProductSerializer(WritableNestedModelSerializer):
     
     class Meta:
         model = Product
-        fields = ['id','user','category','brand','name','color','price','quantity','description','product_image']       
+        fields = ['id','user','category','brand','name','color','price','quantity','description','product_image','publish']       
     
     
 class ProductListSerializer(serializers.ModelSerializer):
     product_image = ProductImageSerializer(many=True,read_only=True)
-    # product_category = CategorySerializer(read_only=True)
-    # product_user = UserProfileSerializer(read_only=True)
-    # user_email = serializers.CharField(source='user.email', read_only=True)
-    # user_email = serializers.CharField(read_only=True)
+    # user_email = serializers.CharField(source='user.email', read_only=True))
     user_detail = serializers.SerializerMethodField()
     category_detail = serializers.SerializerMethodField()
     class Meta:
         model = Product
-        fields = ['id','brand','name','color','price','quantity','description','product_image','user_detail','category_detail']
+        fields = ['id','brand','name','color','price','quantity','description','product_image','user_detail','category_detail','publish']
         
         
     def get_user_detail(self, obj):
-        # return obj.user.email if obj.user else  ''
         if obj.user:
             return {
                     "id":obj.user.id,

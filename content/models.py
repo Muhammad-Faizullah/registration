@@ -20,6 +20,7 @@ class Product(models.Model):
     description = models.CharField(max_length=10000)
     created_at = models.DateTimeField(auto_now_add=True,null=True,blank=True)
     updated_at = models.DateTimeField(auto_now=True)
+    publish = models.BooleanField(default=False)
     
     def __str__(self):
         return f'{self.name}'

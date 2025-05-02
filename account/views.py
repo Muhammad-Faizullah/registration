@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .models import User,Otp
-from .serializer import RegisterSerializer,LoginSerializer,ChangePasswordSerializer,ResetPasswordSerializer,GenerateOtpSerializer,UserProfileSerializer
+from .serializer import RegisterSerializer,LoginSerializer,ChangePasswordSerializer,ResetPasswordSerializer,GenerateOtpSerializer,UserProfileSerializer,AdminUserSerializer
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView,CreateAPIView,UpdateAPIView,DestroyAPIView,RetrieveAPIView
 from rest_framework.views import APIView
@@ -12,9 +12,23 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import math,random
 from rest_framework.serializers import ValidationError
 from django.core.files.storage import Storage,default_storage,DefaultStorage
+from .permissions import UserPermission
 
+class AdminUserView(ListAPIView,CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = AdminUserSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [UserPermission]
 
-class RegisterApi(APIView):
+class AdminUserRUDView(RetrieveAPIView,UpdateAPIView,DestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = AdminUserSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [UserPermission]
+    
+    
+
+class RegisterView(APIView):
 
     def post(self,request,*args,**kwargs):
         serializer = RegisterSerializer(data=request.data)
@@ -25,28 +39,21 @@ class RegisterApi(APIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
-class LoginApi(APIView):
+class LoginView(APIView):
     
     def post(self,request,*args,**kwargs):
         serializer = LoginSerializer(data=request.data)
         
         if serializer.is_valid():
-            email = serializer.data.get('email')
-            password = serializer.data.get('password')
-            user = authenticate(email=email,password=password)
-            
-            if user is None:
-                raise ValidationError({"error":"Invalid credentials"})
-            
-            username = user.username
-            email = user.email
-            refresh_token = RefreshToken.for_user(user)
-            access_token = str(refresh_token.access_token)
-            return Response({"message":"login successful","user":{"id":user.id,"username":username,"email":email},"tokens":{"refresh_token":str(refresh_token),"access_token":access_token}},status=status.HTTP_200_OK)    
+            user = serializer.data.get('user_detail')
+            token = serializer.data.get('token_detail')
+            print(user)
+            print(token)
+            return Response({"User":user,"Token":token},status=status.HTTP_200_OK)    
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class ChangePasswordApi(APIView):
+class ChangePasswordView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
@@ -58,7 +65,7 @@ class ChangePasswordApi(APIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class ResetPasswordApi(APIView):
+class ResetPasswordView(APIView):
     
     def post(self,request,*args,**kwargs):
         serializer = ResetPasswordSerializer(data=request.data)
@@ -68,7 +75,7 @@ class ResetPasswordApi(APIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
                 
-class GenerateOTPApi(APIView):
+class GenerateOTPView(APIView):
     
     def post(self,request,*args,**kwargs):
         serializer = GenerateOtpSerializer(data=request.data)
@@ -79,7 +86,7 @@ class GenerateOTPApi(APIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class UserProfileApi(APIView):
+class UserProfileView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
@@ -98,7 +105,7 @@ class UserProfileApi(APIView):
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class UploadFileApi(APIView):
+class UploadFileView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
