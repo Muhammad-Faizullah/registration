@@ -1,13 +1,14 @@
-import django_filters
+from django_filters import FilterSet
 from content.models import Category,Product
 
 
-class CategoryFilter(django_filters.FilterSet):
+class CategoryFilter(FilterSet):
     class Meta:
         model = Category
         fields = ['name']
 
-class ProductFilter(django_filters.FilterSet):
+class ProductFilter(FilterSet):
     class Meta:
         model = Product
         fields = ['name','category']
+        

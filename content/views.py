@@ -15,29 +15,25 @@ class CategoryListView(ListAPIView,CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset = CategoryFilter
+    filter_backends = (filters.DjangoFilterBackend)
+    filterset_class = CategoryFilter
     
 class CategoryRetrieveView(RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
 
-class ProductListView(APIView):
-    # authentication_classes = [JWTAuthentication]
-    filter_backends = (filters.DjangoFilterBackend,)
-    filterset_fileds = ['name','category']
+class ProductListView(ListAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
+    filter_backends = [filters.DjangoFilterBackend]
+    filterset_class = ProductFilter
+
+class ProductRetrieveView(APIView):
     
     def get(self,request,*args,**kwargs):
         id = kwargs.get('pk')
-        print(id)
-        
-        if id is None:
-            print('---------')
-            obj = Product.objects.all()
-            serializer = ProductListSerializer(obj,many=True)
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        
+       
         try:
             obj = Product.objects.get(id=id)
             serializer = ProductListSerializer(obj)
@@ -58,7 +54,7 @@ class ProductCreateView(APIView):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-class ProductRetrieveView(RetrieveUpdateDestroyAPIView):
+class ProductRUDView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [JWTAuthentication]
