@@ -33,6 +33,7 @@ class ProductListSerializer(serializers.ModelSerializer):
     # user_email = serializers.CharField(source='user.email', read_only=True))
     user_detail = serializers.SerializerMethodField()
     category_detail = serializers.SerializerMethodField()
+    
     class Meta:
         model = Product
         fields = ['id','brand','name','color','price','quantity','description','product_image','user_detail','category_detail','publish']

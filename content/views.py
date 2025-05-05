@@ -10,40 +10,73 @@ from rest_framework.permissions import IsAuthenticated,AllowAny,IsAdminUser
 from django.core.files.storage import Storage,default_storage,DefaultStorage
 from content.filters import CategoryFilter,ProductFilter
 from django_filters import rest_framework as filters
+from account.permissions import AdminPermission,OwnerPermission
+from rest_framework import viewsets
+
+class PublishingView(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [AdminPermission]
+        
+    def product_publish(self,request,pk):
+
+        try:    
+            id = pk
+            obj = Product.objects.get(id=id)
+            if obj.publish == True:
+                return Response({"message":"this product is already published"},status=status.HTTP_400_BAD_REQUEST)
+            obj.publish = True
+            obj.save()
+        except Product.DoesNotExist:
+            return Response({"error":"valid id is required"})
+        return Response({"message":"product published"},status=status.HTTP_201_CREATED)
+    
+    def product_unpublish(self,request,pk):
+
+        try:
+            id = pk
+            obj = Product.objects.get(id=id)
+            if obj.publish == False:
+                return Response({"message":"this product is already unpublished"},status=status.HTTP_400_BAD_REQUEST)
+            obj.publish = False
+            obj.save()        
+        except Product.DoesNotExist:
+            return Response({"error":"valid id is required"})
+        return Response({"message":"product unpublished"},status=status.HTTP_201_CREATED)
+
 
 class CategoryListView(ListAPIView,CreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
+    permission_classes = [OwnerPermission,AdminPermission]
     filter_backends = (filters.DjangoFilterBackend)
-    filterset_class = CategoryFilter
-    
+    filterset_class = CategoryFilter 
 class CategoryRetrieveView(RetrieveUpdateDestroyAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     authentication_classes = [JWTAuthentication]
+    permission_classes = [OwnerPermission,AdminPermission]
+    
 
 class ProductListView(ListAPIView):
     queryset = Product.objects.filter(publish=True)
     serializer_class = ProductListSerializer
     filter_backends = [filters.DjangoFilterBackend]
-    filterset_class = ProductFilter        
-
-class ProductRetrieveView(APIView):
-    
-    def get(self,request,*args,**kwargs):
-        id = kwargs.get('pk')
-       
-        try:
-            obj = Product.objects.get(id=id)
-            serializer = ProductListSerializer(obj)
-            return Response(serializer.data,status=status.HTTP_200_OK)
-        except Product.DoesNotExist:
-            return Response({"error":"This product does not exist"})
-
+    filterset_class = ProductFilter            
+class AdminProductListView(ListAPIView):
+    queryset = Product.objects.order_by('id').reverse()
+    serializer_class = ProductListSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+class ProductRetrieveView(RetrieveAPIView):
+    queryset = Product.objects.all()
+    serializer_class = ProductListSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
 class ProductCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
+    permission_classes = [OwnerPermission,AdminPermission]
     
     def post(self,request,*args,**kwargs):
         user = self.request.user
@@ -53,11 +86,10 @@ class ProductCreateView(APIView):
             serializer.save(user=user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
 class ProductRUDView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [OwnerPermission,AdminPermission]
     
     

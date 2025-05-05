@@ -12,19 +12,19 @@ from rest_framework_simplejwt.tokens import RefreshToken
 import math,random
 from rest_framework.serializers import ValidationError
 from django.core.files.storage import Storage,default_storage,DefaultStorage
-from .permissions import UserPermission
+from .permissions import OwnerPermission
 
 class AdminUserView(ListAPIView,CreateAPIView):
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [UserPermission]
+    permission_classes = [OwnerPermission]
 
 class AdminUserRUDView(RetrieveAPIView,UpdateAPIView,DestroyAPIView):
     queryset = User.objects.all()
     serializer_class = AdminUserSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [UserPermission]
+    permission_classes = [OwnerPermission]
     
     
 
@@ -47,8 +47,6 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.data.get('user_detail')
             token = serializer.data.get('token_detail')
-            print(user)
-            print(token)
             return Response({"User":user,"Token":token},status=status.HTTP_200_OK)    
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

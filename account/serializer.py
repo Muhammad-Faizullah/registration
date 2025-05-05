@@ -31,6 +31,7 @@ class AdminUserSerializer(serializers.ModelSerializer):
         user.is_staff = True
         user.save()
         return user
+    
         
 
 class RegisterSerializer(serializers.Serializer):
