@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from account.serializer import UserProfileSerializer
 from account.models import User
-from .models import Product,ProductImage,Category
+from .models import Product,ProductImage,Category,Color,Quantity,Size
 from drf_writable_nested.serializers import WritableNestedModelSerializer
 
 
@@ -11,21 +11,37 @@ class CategorySerializer(serializers.ModelSerializer):
         model = Category
         fields = ['id','name','description']
 
+
+class ColorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Color
+        fields = ['id','name']
+
+class QuantitySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Quantity
+        fields = ['id','total']
+        
+class SizeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Size
+        fields = ['id','size']
+        
 class ProductImageSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     image_file = serializers.CharField(max_length=200)
     
     class Meta:
         model = ProductImage
-        fields = ['id','product','image_file']
-        
-        
+        fields = ['id','product','image_file']      
 class ProductSerializer(WritableNestedModelSerializer):
     product_image = ProductImageSerializer(many=True)
-    
+    product_color = ColorSerializer()
+    product_quantity = QuantitySerializer()
+    product_size = SizeSerializer()
     class Meta:
         model = Product
-        fields = ['id','user','category','brand','name','color','price','quantity','description','product_image','publish']       
+        fields = ['id','user','category','brand','name','product_color','price','','product_quantity','description','product_image','publish']       
     
     
 class ProductListSerializer(serializers.ModelSerializer):
