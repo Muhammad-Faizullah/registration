@@ -75,8 +75,7 @@ class ProductRetrieveView(RetrieveAPIView):
     permission_classes = [IsAuthenticated]
 class ProductCreateView(APIView):
     authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
-    permission_classes = [OwnerPermission,AdminPermission]
+    permission_classes = [AdminPermission]
     
     def post(self,request,*args,**kwargs):
         user = self.request.user
@@ -90,6 +89,6 @@ class ProductRUDView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [JWTAuthentication]
-    permission_classes = [OwnerPermission,AdminPermission]
+    permission_classes = [AdminPermission]
     
     

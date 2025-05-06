@@ -8,7 +8,7 @@ class ImageAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['id','user','category','brand','name','color','price','quantity','description','created_at','updated_at']
+    list_display = ['id','user','category','brand','name','price','description','created_at','updated_at']
 
 @admin.register(Category)
 class CategoriesAdmin(admin.ModelAdmin):
