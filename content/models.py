@@ -20,8 +20,8 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     publish = models.BooleanField(default=False)
     
-    def __str__(self):
-        return f'{self.name}'
+    # def __str__(self):
+    #     return f'{self.name}'
     # @property
     # def user_email(self):
     #     return self.user.email
@@ -42,3 +42,4 @@ class Variant(models.Model):
     size = models.CharField(max_length=100,choices=Choices)
     quantity = models.IntegerField()
     color = models.CharField(max_length=50)
+    

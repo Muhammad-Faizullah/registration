@@ -22,7 +22,8 @@ class ProductImageSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = ProductImage
-        fields = ['id','product','image_file']      
+        fields = ['id','product','image_file']  
+            
 class ProductSerializer(WritableNestedModelSerializer):
     product_image = ProductImageSerializer(many=True)
     product_variant = VariantSerializer(many=True)
@@ -62,3 +63,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
         else:
             return ''
+        
+
+            
+        

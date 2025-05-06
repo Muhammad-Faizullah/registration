@@ -91,4 +91,5 @@ class ProductRUDView(RetrieveUpdateDestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AdminPermission]
     
-    
+
+        
