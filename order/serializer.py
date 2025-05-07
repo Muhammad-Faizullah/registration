@@ -18,19 +18,6 @@ class OrderSerializer(WritableNestedModelSerializer):
         model = Order
         fields = ['user','order_product','size','color','quantity','country','city','address','phone_number','payment_method','status']
         
-    def create(self, validated_data):
-        pop_data = validated_data.pop('order_product')
-        print('pop data',pop_data)
-        order = Order.objects.create(**validated_data)
-        for data in pop_data:
-            print(data)
-            product = data.get('product')
-            print('product',product)
-            for i in product:
-                OrderProduct.objects.create(order=order,**i)
-                print('created')
-
-        return order
             
     # def validate(self,attrs):
     #     size = attrs.get('size')

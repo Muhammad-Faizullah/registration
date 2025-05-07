@@ -33,7 +33,7 @@ class Order(models.Model):
     
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE,related_name='order_product')
-    product = models.ManyToManyField(Product)
+    product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
 
 # @receiver(post_save, sender=Order)
 # def post_save_order(sender,instance,created,**kwargs): 
