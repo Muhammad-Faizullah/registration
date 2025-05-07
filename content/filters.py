@@ -12,7 +12,4 @@ class ProductFilter(FilterSet):
         model = Product
         fields = ['name','category','publish']
         
-# class VariantFilter(FilterSet):
-#     class Meta:
-#         model = Variant
-#         fields = ['size','color','product']
+    
