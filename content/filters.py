@@ -1,5 +1,5 @@
 from django_filters import FilterSet
-from content.models import Category,Product
+from content.models import Category,Product,Variant
 
 
 class CategoryFilter(FilterSet):
@@ -12,3 +12,7 @@ class ProductFilter(FilterSet):
         model = Product
         fields = ['name','category','publish']
         
+# class VariantFilter(FilterSet):
+#     class Meta:
+#         model = Variant
+#         fields = ['size','color','product']

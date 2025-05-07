@@ -62,18 +62,21 @@ class ProductListView(ListAPIView):
     queryset = Product.objects.filter(publish=True)
     serializer_class = ProductListSerializer
     filter_backends = [filters.DjangoFilterBackend]
-    filterset_class = ProductFilter            
-class AdminProductListView(ListAPIView):
-    queryset = Product.objects.order_by('id').reverse()
-    serializer_class = ProductListSerializer
-    authentication_classes = [JWTAuthentication]
-    permission_classes = [IsAuthenticated]
+    filterset_class = ProductFilter   
 class ProductRetrieveView(RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
-class ProductCreateView(APIView):
+        
+
+class AdminProductListView(ListAPIView):
+    queryset = Product.objects.order_by('id').reverse()
+    serializer_class = ProductListSerializer
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class AdminProductCreateView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AdminPermission]
     
@@ -85,7 +88,7 @@ class ProductCreateView(APIView):
             serializer.save(user=user)
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-class ProductRUDView(RetrieveUpdateDestroyAPIView):
+class AdminProductRUDView(RetrieveUpdateDestroyAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = [JWTAuthentication]

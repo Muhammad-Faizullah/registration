@@ -6,17 +6,18 @@ from rest_framework.response import Response
 from content.models import Variant
 
 class OrderSerializer(serializers.ModelSerializer):
-    # product_variant = VariantSerializer(many=True)
     class Meta:
         model = Order
-        fields = ['product','size','color','quantity','country','city','address','phone_number','payment']
+        fields = ['user','product','size','color','quantity','country','city','address','phone_number','payment']
         
     def validate(self,attrs):
         size = attrs.get('size')
         color = attrs.get('color')
         quantity = attrs.get('quantity')
         product = attrs.get('product')
-        
+        request = self.context.get('request')
+        user = request.user
+        print('user',user)
         try:
             variant_qs = Variant.objects.filter(product=product.id)
         except Variant.DoesNotExist:
@@ -27,6 +28,7 @@ class OrderSerializer(serializers.ModelSerializer):
                 if data.quantity > 0:
                     data.quantity = data.quantity - quantity
                     data.save()
+                    attrs["user"] = user
                     return attrs
                 else:
                     raise serializers.ValidationError({"error":"Sold Out"})
@@ -34,10 +36,12 @@ class OrderSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({"error":"this combination is not available"})
         
     def create(self,validated_data):
-        print("validated_data",validated_data)
+        print('validated_data',validated_data)
         return Order.objects.create(
             **validated_data
         )
+        
+        
                 
                 
 

@@ -15,7 +15,7 @@ class Order(models.Model):
         ('XL','Extra Large')
     ]
 
-    # user = models.ForeignKey(User,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     product = models.ForeignKey(Product,on_delete=models.CASCADE)
     size = models.CharField(max_length=100,choices=Choices,null=True,blank=True)
     color = models.CharField(max_length=100,null=True,blank=True)
