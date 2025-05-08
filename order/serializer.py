@@ -9,26 +9,48 @@ from content.models import Variant
 class OrderProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderProduct
-        fields = ['id','order','product']
+        fields = ['id','order','product','size','color','quantity']
         read_only_fields = ['order']
+        
+    # def validate(self, attrs):
+    #     print('attrs',attrs)
+        
+    #     order_product = attrs.get('product')
+    #     print(order_product)
+        
 
 class OrderSerializer(WritableNestedModelSerializer):
     order_product = OrderProductSerializer(many=True)
     class Meta:
         model = Order
-        fields = ['user','order_product','size','color','quantity','country','city','address','phone_number','payment_method','status']
+        fields = ['user','order_product','country','city','address','phone_number','payment_method','status']
         
             
-    # def validate(self,attrs):
-    #     size = attrs.get('size')
-    #     color = attrs.get('color')
-    #     quantity = attrs.get('quantity')
-    #     product = attrs.get('product')
-    #     request = self.context.get('request')
-    #     user = request.user
-    #     user_email = user.email
-        
-    #     return attrs
+    def validate(self,attrs):
+        request = self.context.get('request')
+        attrs['user'] = request.user
+        order_product = attrs.get('order_product')
+        for data in order_product:
+            product = data.get('product')
+            size = data.get('size')
+            color = data.get('color')
+            quantity = data.get('quantity')
+            variant = Variant.objects.filter(product=product)
+            for i in variant:
+                if size == i.size and color == i.color:
+                    if i.quantity == 0:
+                        raise serializers.ValidationError({"error":"Sold Out"})
+                    elif i.quantity < 0:
+                        print(i.quantity)
+                        i.quantity = 0
+                        print(i.quantity)
+                        i.save()
+                    elif i.quantity - quantity < 0:
+                        raise serializers.ValidationError({"error":f"We have {i.quantity} {i.color } {product.name} in {i.size} size"})
+        return attrs 
+            
+            
+        # return attrs
         # try:
         #     variant_qs = Variant.objects.filter(product=product.id)
         # except Variant.DoesNotExist:
@@ -54,17 +76,15 @@ class OrderListSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Order
-        fields = ['user','order_product','size','color','quantity','country','city','address','phone_number','payment_method','status']
+        fields = ['user','order_product','country','city','address','phone_number','payment_method','status']
  
 class PaymentSerializer(serializers.ModelSerializer):
     amount_received = serializers.IntegerField()
     
     class Meta:
         model = Order
-        fields = ['user','product','amount_received']
+        fields = ['amount_received']
     
     def validate(self, attrs):
-        user = attrs.get('user')
-        product = attrs.get('product')
         amount = attrs.get('amount_received')
         
