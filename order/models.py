@@ -43,6 +43,8 @@ class OrderProduct(models.Model):
 @receiver(post_save, sender=OrderProduct)
 def post_save_order(sender,instance,created,**kwargs): 
     product = instance.product
+    order = instance.order
+    print('order properties',order.status)
     variant_product = Variant.objects.filter(product=product)
     for data in variant_product:      
         if  data.size == instance.size and data.color == instance.color:           
@@ -50,6 +52,11 @@ def post_save_order(sender,instance,created,**kwargs):
                 print(instance.product,"-",instance.color,"-",instance.size,"-",instance.quantity)  
                 data.quantity = data.quantity - instance.quantity
                 data.save()
+                # user = order.user
+                # user_email = user.email
+                
+                
+                
 
     
     

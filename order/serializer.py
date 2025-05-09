@@ -11,13 +11,6 @@ class OrderProductSerializer(serializers.ModelSerializer):
         model = OrderProduct
         fields = ['id','order','product','size','color','quantity']
         read_only_fields = ['order']
-        
-    # def validate(self, attrs):
-    #     print('attrs',attrs)
-        
-    #     order_product = attrs.get('product')
-    #     print(order_product)
-        
 
 class OrderSerializer(WritableNestedModelSerializer):
     order_product = OrderProductSerializer(many=True)
@@ -48,28 +41,6 @@ class OrderSerializer(WritableNestedModelSerializer):
                     elif i.quantity - quantity < 0:
                         raise serializers.ValidationError({"error":f"We have {i.quantity} {i.color } {product.name} in {i.size} size"})
         return attrs 
-            
-            
-        # return attrs
-        # try:
-        #     variant_qs = Variant.objects.filter(product=product.id)
-        # except Variant.DoesNotExist:
-        #     raise serializers.ValidationError({"error":"the variant you want does not exist"})
-        
-        # for data in variant_qs:
-        #     if data.size == size and data.color == color:
-        #         if data.quantity > 0:
-        #             quantity_left = data.quantity - quantity
-        #             if quantity_left < 0:
-        #                 raise serializers.ValidationError({"error":f"We only have {data.quantity} product available"})
-        #             data.quantity = quantity_left
-        #             data.save()
-        #             attrs["user"] = user
-        #             return attrs
-        #         else:
-        #             raise serializers.ValidationError({"error":"Sold Out"})
-        # else:
-        #     raise serializers.ValidationError({"error":"this combination is not available"})
         
 class OrderListSerializer(serializers.ModelSerializer):
     order_product = OrderProductSerializer(many=True,read_only=True)
