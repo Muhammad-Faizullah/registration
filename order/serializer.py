@@ -1,10 +1,11 @@
 from rest_framework import serializers
 from content.serializer import VariantSerializer
 from drf_writable_nested import WritableNestedModelSerializer
-from .models import Order,OrderProduct
+from .models import Order,OrderProduct,Payment
 from content.models import Product
 from rest_framework.response import Response
 from content.models import Variant
+
 
 class OrderProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -34,9 +35,7 @@ class OrderSerializer(WritableNestedModelSerializer):
                     if i.quantity == 0:
                         raise serializers.ValidationError({"error":"Sold Out"})
                     elif i.quantity < 0:
-                        print(i.quantity)
                         i.quantity = 0
-                        print(i.quantity)
                         i.save()
                     elif i.quantity - quantity < 0:
                         raise serializers.ValidationError({"error":f"We have {i.quantity} {i.color } {product.name} in {i.size} size"})
@@ -50,12 +49,18 @@ class OrderListSerializer(serializers.ModelSerializer):
         fields = ['user','order_product','country','city','address','phone_number','payment_method','status']
  
 class PaymentSerializer(serializers.ModelSerializer):
-    amount_received = serializers.IntegerField()
     
     class Meta:
-        model = Order
-        fields = ['amount_received']
+        model = Payment
+        fields = ['order','amount_paid']
     
     def validate(self, attrs):
-        amount = attrs.get('amount_received')
+        order = attrs.get('order')
+        amount = attrs.get('amount_paid')
+        if amount is None:
+            raise serializers.ValidationError({"error":"You should pay for your order"})
+        order.status = "Payed"
+        order.save()
+        return attrs
+            
         

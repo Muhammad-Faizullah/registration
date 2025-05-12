@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework.authentication import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 import math,random
+from django.core.mail import send_mail
+from conf.settings import EMAIL_HOST_USER
+
 
 class AdminUserSerializer(serializers.ModelSerializer):
     
@@ -33,7 +36,6 @@ class AdminUserSerializer(serializers.ModelSerializer):
         return user
     
         
-
 class RegisterSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=50)
     email = serializers.EmailField()
@@ -114,7 +116,6 @@ class LoginSerializer(serializers.Serializer):
             }
             
 
-
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(max_length=50)
     new_password = serializers.CharField(max_length=50)
@@ -191,8 +192,14 @@ class GenerateOtpSerializer(serializers.Serializer):
             raise serializers.ValidationError({"error":"invalid email"})
 
         otp = random. randint(1000, 9999)
-        attrs['user'] = user_obj
-        attrs['otp'] = otp
+        send_mail(
+        "OTP Generated",
+        f"Here is your otp {otp} Do not share this with anyone .",
+        EMAIL_HOST_USER,
+        [email]
+        )
+        # attrs['user'] = user_obj
+        # attrs['otp'] = otp
         return attrs
 
     def create(self,validated_data):

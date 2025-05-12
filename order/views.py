@@ -2,7 +2,7 @@
 from django.shortcuts import render
 from content.models import Product
 from .models import Order
-from .serializer import OrderSerializer,OrderListSerializer
+from .serializer import OrderSerializer,OrderListSerializer,PaymentSerializer
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -21,7 +21,7 @@ class OrderView(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
     
-    def product_order(self,request):
+    def order_product(self,request):
         serializer = OrderSerializer(data=request.data,context={"request":request})
         
         if serializer.is_valid():
@@ -37,3 +37,15 @@ class OrderListView(viewsets.ViewSet):
         obj = Order.objects.all()
         serializer = OrderListSerializer(obj,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)   
+    
+class PaymentView(viewsets.ViewSet):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+    
+    def payment(self,request):
+        serializer = PaymentSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)

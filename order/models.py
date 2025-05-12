@@ -5,11 +5,13 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.response import Response
 from rest_framework.serializers import ValidationError
+from conf.settings import EMAIL_HOST_USER
+from django.core.mail import send_mail
+
+
 
 class Order(models.Model):
     Payment_methods = [
-        ("Credit Card","Credit Card"),
-        ("Debit Card","Debit Card"),
         ("Cash On Delivery","Cash On Delivery")
     ]
 
@@ -40,21 +42,30 @@ class OrderProduct(models.Model):
     color = models.CharField(max_length=100,null=True,blank=True)
     quantity = models.IntegerField(null=True,blank=True)
 
+class Payment(models.Model):
+    order = models.ForeignKey(Order,on_delete=models.CASCADE)
+    payment_date = models.DateField(auto_now_add=True)
+    amount_paid = models.IntegerField()
+    
+
 @receiver(post_save, sender=OrderProduct)
 def post_save_order(sender,instance,created,**kwargs): 
     product = instance.product
     order = instance.order
-    print('order properties',order.status)
     variant_product = Variant.objects.filter(product=product)
     for data in variant_product:      
         if  data.size == instance.size and data.color == instance.color:           
-            if data.quantity > instance.quantity:  
-                print(instance.product,"-",instance.color,"-",instance.size,"-",instance.quantity)  
+            if data.quantity > instance.quantity:
                 data.quantity = data.quantity - instance.quantity
                 data.save()
-                # user = order.user
-                # user_email = user.email
-                
+    user = order.user
+    email = user.email
+    send_mail(
+    "Your Order Has Been Created",
+    f"You have ordered some clothes from MSGM Clothing and the order has been created.Thank You for shopping from MSGM Clothing and we hope you will like our services",
+    EMAIL_HOST_USER,
+    [email]
+    )     
                 
                 
 
