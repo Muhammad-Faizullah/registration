@@ -13,6 +13,7 @@ from django_filters import rest_framework as filters
 from account.permissions import AdminPermission,OwnerPermission
 from rest_framework import viewsets
 
+
 class PublishingView(viewsets.ViewSet):
     authentication_classes = [JWTAuthentication]
     permission_classes = [AdminPermission]
