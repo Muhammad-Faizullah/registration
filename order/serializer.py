@@ -24,20 +24,33 @@ class OrderSerializer(WritableNestedModelSerializer):
         request = self.context.get('request')
         attrs['user'] = request.user
         order_product = attrs.get('order_product')
+        if order_product is None:
+            raise serializers.ValidationError({"error":"provide product you want to order"})
         for data in order_product:
             product = data.get('product')
             size = data.get('size')
             color = data.get('color')
             quantity = data.get('quantity')
-            variant = Variant.objects.filter(product=product)
-            for i in variant:
+            if quantity is None:
+                raise serializers.ValidationError({"error":"enter cloth's quantity"})
+            if color is None:
+                raise serializers.ValidationError({"error":"enter cloth's color"})
+            if size is None:
+                raise serializers.ValidationError({"error":"enter cloth's size "})
+            variants = Variant.objects.filter(product=product)
+            for i in variants:
+                if not variants.filter(size=size, quantity__gte=quantity).exists():
+                    print('size',size)
+                    raise serializers.ValidationError({"error":"This Cloth does not exist"})
+                if not variants.filter(color=color, quantity__gte=quantity).exists():
+                    print('color',color)
+                    raise serializers.ValidationError({"error":"This Cloth does not exist"})                    
                 if size == i.size and color == i.color:
+                    print('i_size and size',i.size,size)
+                    print('i_color and color',i.color,color)
                     if i.quantity == 0:
                         raise serializers.ValidationError({"error":"Sold Out"})
-                    elif i.quantity < 0:
-                        i.quantity = 0
-                        i.save()
-                    elif i.quantity - quantity < 0:
+                    if i.quantity - quantity < 0:
                         raise serializers.ValidationError({"error":f"We have {i.quantity} {i.color } {product.name} in {i.size} size"})
         return attrs 
         

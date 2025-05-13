@@ -43,6 +43,7 @@ class ProductListSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id','brand','name','price','product_variant','description','product_image','user_detail','category_detail','publish']
         
+
         
     def get_user_detail(self, obj):
         if obj.user:

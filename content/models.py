@@ -6,8 +6,8 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=10000)
     
-    # def __str__(self):
-    #     return f'{self.name}'
+    def __str__(self):
+        return self.name
 
 class Product(models.Model):    
     user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
@@ -20,8 +20,8 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     publish = models.BooleanField(default=False)
     
-    # def __str__(self):
-    #     return self.name
+    def __str__(self):
+        return self.name
     # @property
     # def user_email(self):
     #     return self.user.email
