@@ -11,6 +11,7 @@ from django.core.mail import send_mail
 
 
 class Order(models.Model):
+    
     Payment_methods = [
         ("Cash On Delivery","Cash On Delivery")
     ]
@@ -25,10 +26,12 @@ class Order(models.Model):
     city = models.CharField(max_length=100)
     address = models.CharField(max_length=200)
     phone_number = models.CharField(max_length=11)
+    total_amount = models.IntegerField(null=True,blank=True)
     payment_method = models.CharField(max_length=100,choices=Payment_methods,default="Cash On Delivery")
     status = models.CharField(max_length=100,choices=Status,default="Pending",null=True,blank=True)
     
 class OrderProduct(models.Model):
+    
     Choices = [
         ('S','Small'),
         ('M','Medium'),
@@ -40,8 +43,10 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
     size = models.CharField(max_length=100,choices=Choices,null=True,blank=True)
     color = models.CharField(max_length=100,null=True,blank=True)
+    price = models.IntegerField(null=True,blank=True)
     quantity = models.IntegerField(null=True,blank=True)
-
+    total_price = models.IntegerField(null=True,blank=True)
+    
 class Payment(models.Model):
     order = models.ForeignKey(Order,on_delete=models.CASCADE)
     payment_date = models.DateField(auto_now_add=True)
@@ -51,23 +56,39 @@ class Payment(models.Model):
 @receiver(post_save, sender=OrderProduct)
 def post_save_order(sender,instance,created,**kwargs): 
     product = instance.product
-    order = instance.order
+    
     variant_product = Variant.objects.filter(product=product)
+    
     for data in variant_product:      
+        
         if  data.size == instance.size and data.color == instance.color:           
+            
             if data.quantity > instance.quantity:
                 data.quantity = data.quantity - instance.quantity
                 data.save()
-    user = order.user
-    email = user.email
-    send_mail(
-    "Your Order Has Been Created",
-    f"You have ordered some clothes from MSGM Clothing and the order has been created.Thank You for shopping from MSGM Clothing and we hope you will like our services",
-    EMAIL_HOST_USER,
-    [email]
-    )     
-                
-                
-
+    
+      
+@receiver(post_save,sender=Order)
+def post_email_calculation(sender,instance,created,**kwargs):
+    print('instance --->',instance)
+    # order = instance
+    order_products = OrderProduct.objects.filter(order_id=instance.id)
+    if order_products:
+        
+        print('order product ----->',order_products)
+    print('end--')
+    # order_product_total_price = order_products.price * order_products.quantity
+    
+    # 
+    # user = order.user
+    # email = user.email
+    
+    # send_mail(
+    # "Your Order Has Been Created",
+    # f"You have ordered some clothes from MSGM Clothing and the order has been created.Thank You for shopping from MSGM Clothing and we hope you will like our services",
+    # EMAIL_HOST_USER,
+    # [email]
+    # )     
+          
     
     

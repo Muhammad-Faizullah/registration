@@ -5,7 +5,6 @@ from .views import ProductListView,AdminProductListView,CategoryListView,Categor
 urlpatterns = [
     path('Product/List/',ProductListView.as_view()),
     path('Product/List/Admin/',AdminProductListView.as_view()),
-    # path('Product/Access/',ProductAccessView.as_view()),
     path('Product/Retrieve/<int:pk>/',ProductRetrieveView.as_view()),
     path('CreationOfProduct/',AdminProductCreateView.as_view()),
     path('ChangesInProduct/<int:pk>/',AdminProductRUDView.as_view()),

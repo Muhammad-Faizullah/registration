@@ -26,7 +26,6 @@ class AdminUserRUDView(RetrieveAPIView,UpdateAPIView,DestroyAPIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [OwnerPermission]
     
-    
 
 class RegisterView(APIView):
 

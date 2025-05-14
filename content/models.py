@@ -31,6 +31,7 @@ class ProductImage(models.Model):
     image_file = models.ImageField(upload_to="ProductImage/",null=True,blank=True)
     
 class Variant(models.Model):
+    
     Choices = [
         ('S','Small'),
         ('M','Medium'),
@@ -43,5 +44,3 @@ class Variant(models.Model):
     quantity = models.IntegerField()
     color = models.CharField(max_length=50)
     
-    # def __str__(self):
-    #     return self.product

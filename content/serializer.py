@@ -27,6 +27,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializer(WritableNestedModelSerializer):
     product_image = ProductImageSerializer(many=True)
     product_variant = VariantSerializer(many=True)
+    
     class Meta:
         model = Product
         fields = ['id','user','category','brand','name','price','product_variant','description','product_image','publish']       
@@ -46,6 +47,7 @@ class ProductListSerializer(serializers.ModelSerializer):
 
         
     def get_user_detail(self, obj):
+        
         if obj.user:
             return {
                     "id":obj.user.id,
@@ -56,6 +58,7 @@ class ProductListSerializer(serializers.ModelSerializer):
             return ''
         
     def get_category_detail(self,obj):
+        
         if obj.category:
             return {
                     "id":obj.category.id,

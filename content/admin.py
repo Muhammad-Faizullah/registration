@@ -11,7 +11,6 @@ class ImageAdmin(admin.ModelAdmin):
 class VariantInline(admin.TabularInline):
     model = Variant
     
-# @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ['id','category','brand','name','price']
     inlines = [VariantInline]
@@ -19,8 +18,6 @@ class ProductAdmin(admin.ModelAdmin):
     search_fields = ['name','brand']
     list_per_page = 15
 
-    
-# @admin.register(Category)
 class CategoriesAdmin(admin.ModelAdmin):
     list_display = ['id','name']
     search_fields = ['name']
