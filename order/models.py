@@ -71,12 +71,12 @@ def post_save_order(sender,instance,created,**kwargs):
 @receiver(post_save,sender=Order)
 def post_email_calculation(sender,instance,created,**kwargs):
     print('instance --->',instance)
-    # order = instance
-    order_products = OrderProduct.objects.filter(order_id=instance.id)
-    if order_products:
+    order_products = OrderProduct.objects.filter(order=instance)
+    
+    if order_products.exists():
         
         print('order product ----->',order_products)
-    print('end--')
+    print('does not exist --')
     # order_product_total_price = order_products.price * order_products.quantity
     
     # 

@@ -14,6 +14,7 @@ from content.filters import CategoryFilter,ProductFilter
 from django_filters import rest_framework as filters
 from account.permissions import AdminPermission,OwnerPermission
 from rest_framework import viewsets
+from .task import add,birthday_reminder
 
 # Create your views here.
 
@@ -51,3 +52,11 @@ class PaymentView(viewsets.ViewSet):
             return Response(serializer.data,status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+    
+class TaskView(viewsets.ViewSet):
+     
+    def sum(self,request,*args,**kwargs):
+        result = add.delay(10,10)
+        print('result ---',result)
+        return Response({"message":'celery task done'})
+    

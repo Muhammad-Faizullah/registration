@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import OrderView,OrderListView,PaymentView
+from .views import OrderView,OrderListView,PaymentView,TaskView
 
 urlpatterns = [
     path('',OrderView.as_view({"post":"order_product"})),
     path('List/',OrderListView.as_view({"get":"order_list"})),
-    path('Payment/',PaymentView.as_view({"post":"payment"}))
+    path('Payment/',PaymentView.as_view({"post":"payment"})),
+    path('Sum/',TaskView.as_view({"get":"sum"}))
 ]
