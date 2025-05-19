@@ -1,13 +1,13 @@
 from celery import shared_task
 from time import sleep
 
-@shared_task
-def add(x,y):
-    sleep(5)
-    print('Done')
-    return x + y
+# @shared_task
+# def add(x,y):
+#     sleep(5)
+#     print('Done')
+#     return x + y
 
 @shared_task
-def birthday_reminder(name):
+def birthday_reminder(name,date):
     print('name',name)
-    return name
+    return f"{name}'s birthday is on {date}"

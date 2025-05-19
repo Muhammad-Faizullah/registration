@@ -14,8 +14,9 @@ from content.filters import CategoryFilter,ProductFilter
 from django_filters import rest_framework as filters
 from account.permissions import AdminPermission,OwnerPermission
 from rest_framework import viewsets
-from .task import add,birthday_reminder
-
+from .task import birthday_reminder
+from django_celery_beat.models import IntervalSchedule,PeriodicTask
+import json
 # Create your views here.
 
 class OrderView(viewsets.ViewSet):
@@ -54,9 +55,20 @@ class PaymentView(viewsets.ViewSet):
         return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
     
 class TaskView(viewsets.ViewSet):
-     
-    def sum(self,request,*args,**kwargs):
-        result = add.delay(10,10)
-        print('result ---',result)
-        return Response({"message":'celery task done'})
     
+    def name_date(self,request,*args,**kwargs):
+        birthday_reminder.delay(name="Sidique",date="21/06/2025")
+        return Response({"Message":"Task stated"})
+             
+    def reminder(self,request,*args,**kwargs):
+        
+        interval, _ = IntervalSchedule.objects.get_or_create(
+            every = 8,
+            period = IntervalSchedule.SECONDS
+        )
+        PeriodicTask.objects.create(
+            task = "order.task.birthday_reminder",
+            interval = interval,
+            name = "birthday reminder task"
+        )
+        return Response({"Message":"Task scheduled!"})
